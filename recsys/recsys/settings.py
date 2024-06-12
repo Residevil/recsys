@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-3=y7&t+b2d2q8n!^ug3gppzi603l#he3#$lt2f@lu)$c#$sao9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['54.224.243.31']
 
 
 # Application definition
@@ -77,12 +78,12 @@ WSGI_APPLICATION = 'recsys.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydb',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST' : 'localhost',
-        'PORT': 3306,
+        'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.environ.get('DATABASE_NAME', 'mydb'),
+        'USER': os.environ.get('DATABASE_USER', 'root'),
+        'PASSWORD':os.environ.get('DATABASE_PASSWORD', 'password'),
+        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
+        'PORT': os.environ.get('DATABASE_PORT', '3306'),
         # 'ENGINE': 'django.db.backends.mysql',
         # 'OPTIONS': {
         #     'read_default_file': '/path/tp/my.cnf',
@@ -151,3 +152,4 @@ YELP_API_KEY = 'HNkbW2NZ6ZvzgHMUX-lP0aYoD8Vf3geZFiVY8jrP074qqfu-m4tjpfpOzt7MIn6g
 # DEFAULT_FROM_EMAIL = 'TestSite Team <noreply@example.com>'
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+
