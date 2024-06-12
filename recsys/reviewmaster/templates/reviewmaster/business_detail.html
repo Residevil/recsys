@@ -1,0 +1,31 @@
+
+{% extends "base.html "%}
+
+{% block content %}
+
+    {% if business %}
+    <p>Business Id: {{ business.string_id }}</p>
+    <p>Business name: {{ business.name}}</p>
+    <p>Also known as: {{ business.alias}}</p>
+    <p>Industry: {{ business.industry }}</p>
+    <p>Business Profile: <a href="{% url 'business_detail' business.url %}">{{business.url}}</a></p>
+        {% if business.image_url %}
+        <img src="{% url business.image_url %}" alt="business Logo" style="width:500px;height:600px;">
+        {% endif %}
+        {% if business.is_closed %}
+        <p>Closed</p>
+        {% else %}
+        <p>Open</p>
+        {% endif %}
+    <p>Price: {{ business.price}}</p>
+    <p>Review count: {{ business.review_count}}</p>
+    <p>Rating: {{ business.rating}}</p>
+    <p>Location: {{business.address}} {{business.city}} {{business.state}} {{ business.country}}  {{business.zip_code}} </p>
+    <p>Contact: {{ business.phone}}</p>
+    {% else %}
+    <p>Business doesn't exist.</p>
+    {% endif %}
+
+{% endblock %}
+
+

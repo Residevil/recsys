@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>This is the Homepage</h2>
+{% if user.is_authenticated %}
+Hi {{ user.username }}!
+{% comment %} <form action="{% url 'logout' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Log Out</button>
+</form> {% endcomment %}
+{% else %}
+<p>You are not logged in</p>
+{% endif %}
+
+<p><a href="{% url 'user_index'%}">user index</a></p>
+<p><a href="{% url 'business_index'%}">business index</a></p>
+<p><a href="{% url 'review_index'%}">review index</a></p>
+
+
+{% endblock content %}

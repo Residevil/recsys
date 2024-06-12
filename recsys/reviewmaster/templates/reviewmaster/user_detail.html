@@ -1,0 +1,48 @@
+{% extends "base.html "%}
+
+{% block content %}
+
+{% if user %}
+<p>User Id: {{ user.string_id }}</p>
+<p>Username: {{ user.username}}</p>
+    {% if user.profile_url %}
+    <p>User Profile: <a href="{% url 'user_detail' user.profile_url %}">{{user.profile_url}}</a></p>
+    {% endif %}
+
+    {% if user.image_url %}
+    <img src="{% url 'user_detail' user.image_url %}" alt="user image" style="width:500px;height:600px;">
+    {% endif %}
+    {% if rated_businesses %}
+        <div>
+            User has rated the following businesses:
+            <ul>
+                {% for business in rated_businesses%}
+                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            The Content-based recommendation system has recommeded the following businesses:
+            <ul>
+                {% for business in content_based_recommended_businesses%}
+                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            The Collaborative recommendation system has recommeded the following businesses:
+            <ul>
+                {% for business in collaborative_based_recommended_businesses%}
+                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% else %}
+<p>User doesn't exist.</p>
+{% endif %}
+
+{% endblock %}
+
+
+

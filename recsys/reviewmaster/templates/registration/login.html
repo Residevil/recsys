@@ -1,0 +1,50 @@
+
+
+{% extends "base.html" %}
+{% load django_bootstrap5%}
+
+{% block content %}
+
+{% comment %} <div class="center"> {% endcomment %}
+    <h2 class="text-center"> Log In </h2>
+    <form method="post" class="form">
+        {% csrf_token %}
+        {% comment %} {{ forms.errors }}
+        {{ form.non_field_errors }} {% endcomment %}
+        {% bootstrap_form form%}
+
+        {% comment %} {% if form.errors %}
+        <p>Incorrect username or password. Please try again.</p>
+        {% endif %}
+    
+        {% if login_next %}
+            {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+            {% else %}
+            <p>Please login to see this page.</p>
+            {% endif %}
+        {% endif %} {% endcomment %}
+        {% comment %} <h2 class="text-center">Log in to your account</h2>
+        {% for field in form %}
+        <table>
+            <tr>
+                <td>{{ field.label_tag }}</td>
+                <td>{{ field }}</td>
+                {% if field.errors %}
+                    <small>{{field.errors|striptags}}</small>
+                {% endif %}
+            </tr>
+        </table>
+        {% endfor %} {% endcomment %}
+
+        <button type="submit"  class="btn btn-primary">Log In</button>
+        {% comment %} <input type="hidden" name="username" value="{{ user.username }}">
+        <input type="hidden" name="password" value="{{ user.password }}"> {% endcomment %}
+
+        <p class="text-center">Forgot your password?<a href="{% url 'password_reset' %}">Reset Password</a></p>
+        <p class="text-center">Don't have an account?<a href="{% url 'register' %}">Join Now</a></p>
+    </form>
+{% comment %} </div> {% endcomment %}
+
+{% endblock content %}
