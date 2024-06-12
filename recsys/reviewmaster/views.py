@@ -77,10 +77,10 @@ class UserDetailView(DetailView):
                     'content_based_recommended_businesses': content_based_recommended_businesses,
                     'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses}
         if not request.user.is_authenticated:
-            return HttpResponseRedirect("/login/")
-        if request.user != user:
-            messages.error(request, "You are not the right user.")
-            return redirect('user_index')
+            return HttpResponseRedirect(request, "login")
+        # if request.user != user:
+            # messages.error(request, "You are not the right user.")
+            # return redirect('user_index')
         return render(request, 'reviewmaster/user_detail.html', context)
     
     def post(self, request, username):
@@ -88,10 +88,10 @@ class UserDetailView(DetailView):
         rated_businesses = user.rated_businesses()
         content_based_recommended_businesses = user.content_based_recommended_businesses()
         collaborative_based_recommended_businesses = user.collaborative_based_Recommended_businesses()
-        context = {{'user': user, 
+        context = {'user': user, 
                     'rated_businesses': rated_businesses,
                     'content_based_recommended_businesses': content_based_recommended_businesses,
-                    'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses}}
+                    'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses}
         if request.user != user:
             return redirect('user_index')
         return render(request, 'reviewmaster/user_detail.html', context)
