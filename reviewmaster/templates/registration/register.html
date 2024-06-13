@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block content %}      
+
+
+<div class="center">
+    <h2 class="text-center">Create your account</h2>
+    <form method="post" class="form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+      {% comment %} {% for field in form %}
+              {{ field.label_tag }} 
+              {{ field }}
+            </br>
+              {% if field.errors %}
+                  <small class="error">{{ field.errors|striptags  }}</small> 
+              {% endif %}
+      {% endfor %} {% endcomment %}
+      
+      <input type="submit" value="register" class="btn btn-primary">
+      <hr>
+      <p class="text-center">Already have an account? <a href="{% url 'login'%}">Login Here</a></p>
+      </form>
+  </div>
+
+{% endblock %}

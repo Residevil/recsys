@@ -1,0 +1,19 @@
+{% extends "base.html "%}
+
+{% block content %}
+
+<h1>Reviews</h1>
+
+<ul class="list-group">
+{% for review in reviews %}
+    <li class="list-group-item">
+        <a class="list-group-item-action" href="{% url 'review_detail' review.string_id %}">
+            {{review.string_id}}
+        </a>
+    </li>
+{% empty %}
+    <p>No review is available.</p>
+{% endfor %}
+</ul>
+
+{% endblock %}
