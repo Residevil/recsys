@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-3=y7&t+b2d2q8n!^ug3gppzi603l#he3#$lt2f@lu)$c#$sao9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['54.224.243.31', '127.0.0.1']
+ALLOWED_HOSTS = ['54.91.206.219', '127.0.0.1']
 
 
 # Application definition
@@ -134,7 +134,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 LOGIN_REDIRECT_URL = "index"
-LOGOUT_REDIRECT_URL = "index"
+LOGOUT_REDIRECT_URL = "login"
 
 
 # Default primary key field type

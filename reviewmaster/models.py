@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-
 from .managers import CustomUserManager
+from django.apps import apps
 
 # Create your models here.
 
@@ -61,7 +61,16 @@ class User(AbstractUser):
             review__business__in=rated_businesses_ratings.keys()
         ).distinct()
                 
-        return recommended_businesses        
+        return recommended_businesses
+
+    def tensorflow_recommended_businesses(self):
+        Recommender = apps.get_model('reviewmaster', 'Recommender')
+        recommender = Recommender()
+        recommender.train()
+        user_id = self.pk
+        recommended_biz_ids = recommender.recommend(user_id)
+        recommended_businesses = Business.objects.filter(pk__in=recommended_biz_ids)
+        return recommended_businesses
 
     def __str__(self):
         return self.email
@@ -105,7 +114,7 @@ class Business(models.Model):
         
 
     def __str__(self):
-        return str(self.name) + str(self.string_id) + " at " + str(self.city)
+        return str(self.name) + " at " + str(self.city)
 
 class Review(models.Model):
     RATING_STARS = [

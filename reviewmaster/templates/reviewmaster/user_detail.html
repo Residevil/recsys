@@ -22,7 +22,7 @@
             </ul>
         </div>
         <div>
-            The Content-based recommendation system has recommeded the following businesses:
+            The Content-based recommendation system has recommended the following businesses:
             <ul>
                 {% for business in content_based_recommended_businesses%}
                 <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
@@ -30,9 +30,17 @@
             </ul>
         </div>
         <div>
-            The Collaborative recommendation system has recommeded the following businesses:
+            The Collaborative recommendation system has recommended the following businesses:
             <ul>
                 {% for business in collaborative_based_recommended_businesses%}
+                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            The Tensorflow recommendation system has recommended the following businesses:
+            <ul>
+                {% for business in tensorflow_recommended_businesses%}
                 <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
                 {% endfor %}
             </ul>

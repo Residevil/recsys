@@ -72,15 +72,17 @@ class UserDetailView(DetailView):
         rated_businesses = user.rated_businesses()
         content_based_recommended_businesses = user.content_based_recommended_businesses()
         collaborative_based_recommended_businesses = user.collaborative_based_Recommended_businesses()
+        tensorflow_recommended_businesses = user.tensorflow_recommended_businesses()
         context = {'user': user, 
                     'rated_businesses': rated_businesses,
                     'content_based_recommended_businesses': content_based_recommended_businesses,
-                    'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses}
+                    'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses,
+                    'tensorflow_recommended_business': tensorflow_recommended_businesses}
         if not request.user.is_authenticated:
-            return HttpResponseRedirect(request, "login")
-        # if request.user != user:
-            # messages.error(request, "You are not the right user.")
-            # return redirect('user_index')
+            return redirect("login")
+        if request.user != user:
+            messages.error(request, "You are not the right user.")
+            return redirect('user_index')
         return render(request, 'reviewmaster/user_detail.html', context)
     
     def post(self, request, username):
@@ -88,10 +90,12 @@ class UserDetailView(DetailView):
         rated_businesses = user.rated_businesses()
         content_based_recommended_businesses = user.content_based_recommended_businesses()
         collaborative_based_recommended_businesses = user.collaborative_based_Recommended_businesses()
+        tensorflow_recommended_businesses = user.tensorflow_recommended_businesses()
         context = {'user': user, 
                     'rated_businesses': rated_businesses,
                     'content_based_recommended_businesses': content_based_recommended_businesses,
-                    'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses}
+                    'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses,
+                   'tensorflow_recommended_business': tensorflow_recommended_businesses}
         if request.user != user:
             return redirect('user_index')
         return render(request, 'reviewmaster/user_detail.html', context)
@@ -106,9 +110,48 @@ class UserDetailView(DetailView):
     # return render(request, 'reviewmaster/business_index.html', {'businesses': businesses})
 class BusinessIndexView(ListView):
     def get(self, request):
+        url = 'https://api.yelp.com/v3/businesses/search'
+        headers = {
+            'Authorization': 'Bearer ' + settings.YELP_API_KEY
+        }
+        params = {
+            'location': 'Vancouver',
+            'limit': 2
+        }
+        business_count = 0
+        review_count = 0
+        actual_user_count = 0
+        fake_user_count = 0
+        # Send the request to the Yelp Fusion API
+        response = requests.get(url, headers=headers, params=params)
+        for business_data in response.json()['businesses']:
+            # Create a new Business object and save it to the database
+            business = Business(
+                string_id = business_data['id'],
+                alias = business_data['alias'],
+                name = business_data['name'],
+                image_url = business_data['image_url'],
+                is_closed = business_data['is_closed'],
+                url = business_data['url'],
+                review_count = business_data['review_count'],
+                rating = business_data['rating'],
+                latitude = business_data['coordinates']['latitude'],
+                longitude = business_data['coordinates']['longitude'],
+                price = business_data.get('price', '$'),
+                city = business_data['location']['city'],
+                zip_code = business_data['location']['zip_code'],
+                country = business_data['location']['country'],
+                state = business_data['location']['state'],
+                address = ''.join(business_data['location']['display_address']),
+                phone = business_data['phone'],
+            )
+            business.save()
+            business_count += 1
         businesses = Business.objects.all().order_by('name')
         context = {'businesses': businesses}
         return render(request, 'reviewmaster/business_index.html', context)
+    
+        
         
     def post(self, request):
         businesses = Business.objects.all().order_by('name')
