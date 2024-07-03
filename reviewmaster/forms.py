@@ -1,9 +1,17 @@
 from .models import User, Business, Review
 from django import forms
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
+class GenerateRandomUserForm(forms.Form):
+    total = forms.IntegerField(
+        validators=[
+            MinValueValidator(50),
+            MaxValueValidator(500)
+        ]
+    )
 
 class RegisterForm(UserCreationForm):   
     email = forms.EmailField(max_length=254)

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Django Celery Example</h1>
+<h2><b>Generate Random Users</b></h2>
+<form method="post" class="Form">
+ {% csrf_token %}
+ <table>
+  {{form}}
+ </table>
+ <button type="submit">Submit</button>
+</form>
+
+
+{% endblock content %}

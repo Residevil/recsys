@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if user %}
-<p>User Id: {{ user.string_id }}</p>
+<p>User Id: {{ user.int_id }}</p>
 <p>Username: {{ user.username}}</p>
     {% if user.profile_url %}
     <p>User Profile: <a href="{% url 'user_detail' user.profile_url %}">{{user.profile_url}}</a></p>
@@ -17,7 +17,7 @@
             User has rated the following businesses:
             <ul>
                 {% for business in rated_businesses%}
-                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                <li><a href="{% url 'business_detail' business.int_id %}">{{business.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -25,7 +25,7 @@
             The Content-based recommendation system has recommended the following businesses:
             <ul>
                 {% for business in content_based_recommended_businesses%}
-                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                <li><a href="{% url 'business_detail' business.int_id %}">{{business.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -33,7 +33,7 @@
             The Collaborative recommendation system has recommended the following businesses:
             <ul>
                 {% for business in collaborative_based_recommended_businesses%}
-                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                <li><a href="{% url 'business_detail' business.int_id %}">{{business.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -41,7 +41,7 @@
             The Tensorflow recommendation system has recommended the following businesses:
             <ul>
                 {% for business in tensorflow_recommended_businesses%}
-                <li><a href="{% url 'business_detail' business.string_id %}">{{business.name}}</a></li>
+                <li><a href="{% url 'business_detail' business.int_id %}">{{business.name}}</a></li>
                 {% endfor %}
             </ul>
         </div>

@@ -2,6 +2,9 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_recommenders as tfrs
 from django.apps import apps
+from django.conf import settings
+from django.contrib.auth import get_user_model
+
 
 class RecommenderModel(tfrs.Model):
     def __init__(self, num_biz, num_user):
@@ -10,7 +13,7 @@ class RecommenderModel(tfrs.Model):
         self.user_embeddings = tf.keras.layers.Embedding(input_dim=num_user, output_dim=5)
         self.rating = tf.keras.layers.Dense(1)
 
-    def call(self, input):
+    def call(self, inputs):
         user_embedding = self.user_embeddings(inputs['user_id'])
         biz_embedding = self.itemm_embeddings(inputs['biz_id'])
         return self.rating(tf.concat([user_embedding, biz_embedding], axis = 1))
@@ -29,8 +32,10 @@ class Recommender(object):
         self.biz_map = {}
 
     def train(self):
-        self.num_user = ()
-        self.num_biz = ()
+        User = apps.get_model('reviewmaster', 'User')
+        Business = apps.get_model('reviewmaster', 'Business')
+        self.num_user = 1000
+        self.num_biz = 1000
         user_ids = []
         biz_ids = []
         ratings= []
@@ -62,7 +67,8 @@ class Recommender(object):
         model = RecommenderModel(self.num_biz, self.num_user)
         model.compile(optimizer=tf.keras.optimizers.Adam(0.1))
         model.fit(data, epochs=100)
-        return model
+        model.save_weights(settings.TRAINED_MODEL_PATH)
+
 
     def recommend(self, user_id, model, limit=5):
         # Generate recommendations for a user

@@ -7,7 +7,7 @@
 <ul class="list-group">
 {% for business in businesses %}
     <li class="list-group-item">
-        <a class="list-group-item-action" href="{% url 'business_detail' business.string_id %}">
+        <a class="list-group-item-action" href="{% url 'business_detail' business.int_id %}">
             {{business.name}}
         </a>
     </li>

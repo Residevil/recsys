@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
+    'django_celery_beat',
+    'django_celery_results',
     'reviewmaster.apps.ReviewmasterConfig',
 ]
 
@@ -153,3 +155,11 @@ YELP_API_KEY = 'HNkbW2NZ6ZvzgHMUX-lP0aYoD8Vf3geZFiVY8jrP074qqfu-m4tjpfpOzt7MIn6g
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
+#Celery Configuration Options
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+# CELERY_BROKER_URL = os.environ.get('RABBITMQ_URL', 'amqp://localhost')
+CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+TRAINED_MODEL_PATH = os.path.join(BASE_DIR, 'trained_model.weights.h5')

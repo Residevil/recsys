@@ -1,6 +1,9 @@
+import random
+
 import requests
 from .models import User, Business, Review
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, GenerateRandomUserForm
+from .tasks import create_random_user_accounts
 from django import forms
 from django.forms import ValidationError
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
@@ -67,36 +70,44 @@ class UserDetailView(DetailView):
     context_object_name = 'user'
     
     # @login_required
-    def get(self, request, username):
-        user = get_object_or_404(User, pk=username)       
+    def get(self, request, int_id, **kwargs):
+        user = get_object_or_404(User, pk=int_id)
         rated_businesses = user.rated_businesses()
         content_based_recommended_businesses = user.content_based_recommended_businesses()
         collaborative_based_recommended_businesses = user.collaborative_based_Recommended_businesses()
         tensorflow_recommended_businesses = user.tensorflow_recommended_businesses()
+        # tensorflow_recommended_businesses_with_city = user.tensorflow_recommended_businesses_with_city()
         context = {'user': user, 
                     'rated_businesses': rated_businesses,
                     'content_based_recommended_businesses': content_based_recommended_businesses,
                     'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses,
-                    'tensorflow_recommended_business': tensorflow_recommended_businesses}
+                    'tensorflow_recommended_businesses': tensorflow_recommended_businesses,
+                    # 'tensorflow_recommended_businesses_with_city': tensorflow_recommended_businesses_with_city,
+                   }
         if not request.user.is_authenticated:
             return redirect("login")
-        if request.user != user:
+        if request.user != user and not request.user.is_staff:
             messages.error(request, "You are not the right user.")
             return redirect('user_index')
         return render(request, 'reviewmaster/user_detail.html', context)
     
-    def post(self, request, username):
-        user = get_object_or_404(User, pk=username)       
+    def post(self, request, int_id, **kwargs):
+        user = get_object_or_404(User, pk=int_id)
         rated_businesses = user.rated_businesses()
         content_based_recommended_businesses = user.content_based_recommended_businesses()
         collaborative_based_recommended_businesses = user.collaborative_based_Recommended_businesses()
         tensorflow_recommended_businesses = user.tensorflow_recommended_businesses()
-        context = {'user': user, 
+        # tensorflow_recommended_businesses_with_city = user.tensorflow_recommended_businesses_with_city()
+        context = {'user': user,
                     'rated_businesses': rated_businesses,
                     'content_based_recommended_businesses': content_based_recommended_businesses,
                     'collaborative_based_recommended_businesses': collaborative_based_recommended_businesses,
-                   'tensorflow_recommended_business': tensorflow_recommended_businesses}
+                    'tensorflow_recommended_businesses': tensorflow_recommended_businesses,
+                    # 'tensorflow_recommended_businesses_with_city': tensorflow_recommended_businesses_with_city,
+                   }
+
         if request.user != user:
+            messages.error(request, "You are not the right user.")
             return redirect('user_index')
         return render(request, 'reviewmaster/user_detail.html', context)
 
@@ -110,43 +121,43 @@ class UserDetailView(DetailView):
     # return render(request, 'reviewmaster/business_index.html', {'businesses': businesses})
 class BusinessIndexView(ListView):
     def get(self, request):
-        url = 'https://api.yelp.com/v3/businesses/search'
-        headers = {
-            'Authorization': 'Bearer ' + settings.YELP_API_KEY
-        }
-        params = {
-            'location': 'Vancouver',
-            'limit': 2
-        }
-        business_count = 0
-        review_count = 0
-        actual_user_count = 0
-        fake_user_count = 0
-        # Send the request to the Yelp Fusion API
-        response = requests.get(url, headers=headers, params=params)
-        for business_data in response.json()['businesses']:
-            # Create a new Business object and save it to the database
-            business = Business(
-                string_id = business_data['id'],
-                alias = business_data['alias'],
-                name = business_data['name'],
-                image_url = business_data['image_url'],
-                is_closed = business_data['is_closed'],
-                url = business_data['url'],
-                review_count = business_data['review_count'],
-                rating = business_data['rating'],
-                latitude = business_data['coordinates']['latitude'],
-                longitude = business_data['coordinates']['longitude'],
-                price = business_data.get('price', '$'),
-                city = business_data['location']['city'],
-                zip_code = business_data['location']['zip_code'],
-                country = business_data['location']['country'],
-                state = business_data['location']['state'],
-                address = ''.join(business_data['location']['display_address']),
-                phone = business_data['phone'],
-            )
-            business.save()
-            business_count += 1
+        # url = 'https://api.yelp.com/v3/businesses/search'
+        # headers = {
+        #     'Authorization': 'Bearer ' + settings.YELP_API_KEY
+        # }
+        # params = {
+        #     'location': 'Vancouver',
+        #     'limit': 2
+        # }
+        # business_count = 0
+        # review_count = 0
+        # actual_user_count = 0
+        # fake_user_count = 0
+        # # Send the request to the Yelp Fusion API
+        # response = requests.get(url, headers=headers, params=params)
+        # for business_data in response.json()['businesses']:
+        #     # Create a new Business object and save it to the database
+        #     business = Business(
+        #         string_id = business_data['id'],
+        #         alias = business_data['alias'],
+        #         name = business_data['name'],
+        #         image_url = business_data['image_url'],
+        #         is_closed = business_data['is_closed'],
+        #         url = business_data['url'],
+        #         review_count = business_data['review_count'],
+        #         rating = business_data['rating'],
+        #         latitude = business_data['coordinates']['latitude'],
+        #         longitude = business_data['coordinates']['longitude'],
+        #         price = business_data.get('price', '$'),
+        #         city = business_data['location']['city'],
+        #         zip_code = business_data['location']['zip_code'],
+        #         country = business_data['location']['country'],
+        #         state = business_data['location']['state'],
+        #         address = ''.join(business_data['location']['display_address']),
+        #         phone = business_data['phone'],
+        #     )
+        #     business.save()
+        #     business_count += 1
         businesses = Business.objects.all().order_by('name')
         context = {'businesses': businesses}
         return render(request, 'reviewmaster/business_index.html', context)
@@ -165,9 +176,9 @@ class BusinessIndexView(ListView):
 class BusinessDetailView(DetailView):
     def get(self, request, business_id):
         business = get_object_or_404(Business, pk=business_id)
-        context = {'business': business}
-        if request.business != business:
-            return redirect('business_index')
+        context = {'business': business, 'id': business_id}
+        # if request.business != business:
+        #     return redirect('business_index')
         return render(request, 'reviewmaster/business_detail.html', context)
         
     def post(self, request, business_id):
@@ -346,7 +357,10 @@ class RegisterView(FormView):
     def form_valid(self, form):
         user = form.save(commit = False)
         user.username = user.username.lower()
-        user.string_id = user.username
+        user.int_id = random.randint(1,1000)
+        user_ids = User.objects.all().values("int_id")
+        while user.int_id in user_ids:
+            user.int_id = random.randint(1, 1000)
         user.save()
         messages.success(self.request, f'you have signed up successfully')
         if user:
@@ -354,9 +368,7 @@ class RegisterView(FormView):
             return redirect('index')
         else:
             return render(self.request, 'registration/register.html', {'form': form})
-            
-        # return super(RegisterView, self).form_valid(form)
-    
+
 
 class MyLoginView(LoginView):
     form_class = LoginForm
@@ -480,16 +492,27 @@ class PasswordResetDoneView(View):
             return HttpResponseRedirect("/login/")
         return redirect('login')    
 
+class GenerateRandomUserView(FormView):
+    template_name = 'reviewmaster/generate_random_users.html'
+    form_class = GenerateRandomUserForm
+
+    def form_valid(self, form):
+        total = form.cleaned_data.get('total')
+        create_random_user_accounts.delay(total)
+        messages.success(self.request, 'We are generating your random users! Wait a moment and refresh this page.')
+        return redirect('user_index')
+
+
 @staff_member_required
 class UserCreateView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     redirect_field_name = 'login'
     model = User
-    fields = ['string_id', 'profile_url', 'image_url', 'name']
+    fields = ['int_id', 'profile_url', 'image_url', 'name']
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['string_id', 'profile_url', 'image_url', 'name']
+    fields = ['int_id', 'profile_url', 'image_url', 'name']
     template_name_suffix = "_update_form"
 
 class UserDeleteView(LoginRequiredMixin, DeleteView):
@@ -501,15 +524,16 @@ class BusinessCreateView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     redirect_field_name = 'login'
     model = Business
-    fields = ['string_id', 'alias', 'name', 'image_url', 
+    fields = ['int_id', 'alias', 'name', 'image_url',
               'is_closed', 'review_count', 'rating', 
               'latitude', 'longitude', 'price', 
               'city', 'zip_code', 'country', 'state', 
               'address', 'phone', 'users']
 
+
 class BusinessUpdateView(LoginRequiredMixin, UpdateView):
     model = Business
-    fields = ['string_id', 'alias', 'name', 'image_url', 
+    fields = ['int', 'alias', 'name', 'image_url',
               'is_closed', 'review_count', 'rating', 
               'latitude', 'longitude', 'price', 
               'city', 'zip_code', 'country', 'state', 
@@ -525,11 +549,11 @@ class ReviewCreateView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
     redirect_field_name = 'login'
     model = Review
-    fields = ['string_id', 'url', 'text', 'rating', 'user', 'business', 'created_at', 'updated_at']
+    fields = ['int_id', 'url', 'text', 'rating', 'user', 'business', 'created_at', 'updated_at']
 
 class ReviewUpdateView(LoginRequiredMixin, UpdateView):
     model = Review
-    fields = ['string_id', 'url', 'text', 'rating', 'user', 'business', 'created_at', 'updated_at']
+    fields = ['int_id', 'url', 'text', 'rating', 'user', 'business', 'created_at', 'updated_at']
     template_name_suffix = "_update_form"
 
 class ReviewDeleteView(LoginRequiredMixin, DeleteView):

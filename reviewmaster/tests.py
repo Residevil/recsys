@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.conf import settings
+from celery import shared_task
 
 
 # Create your tests here.
@@ -41,3 +43,7 @@ class UsersManagersTests(TestCase):
         with self.assertRaises(ValueError):
             User.objects.create_superuser( # type: ignore
                 email="super@user.com", password="foo", is_superuser=False)
+
+    @shared_task
+    def test(self):
+        print(settings.TRAINED_MODEL_PATH)

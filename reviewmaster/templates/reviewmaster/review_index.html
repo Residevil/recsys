@@ -7,8 +7,8 @@
 <ul class="list-group">
 {% for review in reviews %}
     <li class="list-group-item">
-        <a class="list-group-item-action" href="{% url 'review_detail' review.string_id %}">
-            {{review.string_id}}
+        <a class="list-group-item-action" href="{% url 'review_detail' review.int_id %}">
+            {{review.int_id}}
         </a>
     </li>
 {% empty %}

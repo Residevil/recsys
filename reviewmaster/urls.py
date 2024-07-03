@@ -25,7 +25,7 @@ from . import views
 urlpatterns = [
     path('', views.IndexView.as_view(template_name = 'index.html'), name='index'),
     path('users/', views.UserIndexView.as_view(template_name = 'user_index.html'), name='user_index'),
-    path('users/<slug:username>/', views.UserDetailView.as_view(template_name = 'user_detail.html'), name='user_detail'),
+    path('users/<int:int_id>/', views.UserDetailView.as_view(template_name = 'user_detail.html'), name='user_detail'),
     path('businesses/', views.BusinessIndexView.as_view(template_name = 'business_index.html'), name='business_index'),
     path('businesses/<int:business_id>/', views.BusinessDetailView.as_view(template_name = 'business_detail.html'), name='business_detail'),
     path('reviews/', views.ReviewIndexView.as_view(template_name = 'review_index.html'), name='review_index'),
@@ -48,15 +48,6 @@ urlpatterns = [
     # path("password-reset/", views.PasswordResetView.as_view(template_name="registration/password_reset.html"), name='password_reset'),
     # path("password-reset-done/", views.PasswordResetDoneView.as_view(template_name="registration/password_reset_done.html"), name='password_reset_done'),
     # path("change-password/", views.PasswordChangeView.as_view(template_name="registration/password_change.html"), name="password_change"),
-    
-    # path('login/', views.login_view, name = 'login'),
-    # path('login/', auth_views.LoginView.as_view(next_page='businesses/',
-    #                                             template_name = 'registration/login.html'), name = 'login'),
-    # path('logout/', auth_views.LogoutView.as_view(next_page='login/',
-    #                                             template_name = 'registration/logout.html'), name = 'logout'),
-    
-    
-                                                
-    
-    
+
+    path("generate/", views.GenerateRandomUserView.as_view(template_name="reviewmaster/generate_random_users.html"), name="generate_random_users"),
 ]

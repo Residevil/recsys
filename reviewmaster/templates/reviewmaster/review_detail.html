@@ -3,9 +3,9 @@
 {% block content %}
 
 {% if review %}
-<p>Review Id is {{ review.string_id }}</p>
+<p>Review Id is {{ review.int_id }}</p>
 <p>Business reviewed: {{ review.business}}</p>
-<p>Business URL: <a href="{% url 'review_detail' review.url %}">{{review.url}}</a></p>
+{% comment %}<p>Business URL: <a href="{% url 'review_detail' review.url %}">{{review.url}}</a></p> {% endcomment%}
 <p>Rating: {{review.rating}}</p>
 <p>Review by: {{review.user}}</p>
 <p>Created at: {{review.created_at}}</p>
@@ -22,7 +22,7 @@
     The Content-based recommendation system has recommeded the following businesses:
     <ul>
         {% for business in content_based_recommended_businesses%}
-        <li><a href="{% url 'business_detail' business.id %}">{{business.name}}</a></li>
+        <li><a href="{% url 'business_detail' business.int_id %}">{{business.name}}</a></li>
         {% endfor %}
     </ul>
 </div>
@@ -30,7 +30,7 @@
     The Collaborative recommendation system has recommeded the following businesses:
     <ul>
         {% for business in collaborative_based_recommended_businesses%}
-        <li><a href="{% url 'business_detail' business.id %}">{{business.name}}</a></li>
+        <li><a href="{% url 'business_detail' business.int_id %}">{{business.name}}</a></li>
         {% endfor %}
     </ul>
 </div> {% endcomment %}

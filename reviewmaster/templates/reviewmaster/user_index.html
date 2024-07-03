@@ -7,8 +7,8 @@
 <ul class="list-group">
 {% for user in users %}
     <li class="list-group-item">
-        <a class="list-group-item-action" href="{% url 'user_detail' user.username %}">
-            {{user.username}}
+        <a class="list-group-item-action" href="{% url 'user_detail' user.int_id %}">
+            {{user.username}} - {{ user.email }}
         </a>
     </li>
 {% empty %}

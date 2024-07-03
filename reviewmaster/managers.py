@@ -1,3 +1,6 @@
+import random
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
@@ -14,7 +17,12 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_("The Email must be set"))
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        int_id = random.randint(1,1000)  # set up user capacity
+        User = get_user_model()
+        user_ids = User.objects.all().values("int_id")
+        while int_id in user_ids:
+            int_id = random.randint(1, 1000)
+        user = self.model(email=email, int_id=int_id, **extra_fields)
         user.set_password(password)
         user.save()
         return user

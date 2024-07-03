@@ -1,13 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+import tensorflow as tf
+
+from recsys import settings
+from .tensorflow import RecommenderModel, Recommender
 from .managers import CustomUserManager
-from django.apps import apps
 
 # Create your models here.
 
 class User(AbstractUser):
-    string_id = models.CharField(max_length=22, primary_key=True)
+    int_id = models.IntegerField(primary_key=True, unique=True)
     profile_url = models.URLField(max_length=1000, null=True)
     image_url = models.URLField(max_length=1000, null=True)
 
@@ -63,14 +66,36 @@ class User(AbstractUser):
                 
         return recommended_businesses
 
-    def tensorflow_recommended_businesses(self):
-        Recommender = apps.get_model('reviewmaster', 'Recommender')
+    def tensorflow_recommended_businesses(self, limit=5):
+        # recommender = Recommender()
+        # recommender.train()
+        # user_id = self.pk
+        # recommended_biz_ids = recommender.recommend(user_id)
+        # recommended_businesses = Business.objects.filter(pk__in=recommended_biz_ids)
+        # return recommended_businesses
         recommender = Recommender()
         recommender.train()
-        user_id = self.pk
-        recommended_biz_ids = recommender.recommend(user_id)
-        recommended_businesses = Business.objects.filter(pk__in=recommended_biz_ids)
-        return recommended_businesses
+        model = RecommenderModel(1000, 1000)
+        model.load_weights(settings.TRAINED_MODEL_PATH)
+        query = tf.constant([self.int_id])
+        candidates = tf.range(1000, dtype=tf.int32)
+        user_embeddings = model.user_embeddings(query)
+        biz_embeddings = model.biz_embeddings(candidates)
+        scores = tf.matmul(user_embeddings, biz_embeddings, transpose_b=True)
+        top_indices = tf.argsort(scores, axis=1, direction='DESCENDING')[0][:limit]
+        return Business.objects.filter(int_id__in=top_indices.numpy())
+
+    # def tensorflow_recommended_businesses_with_city(self, limit=5):
+    #     model = RecommenderModel(Business.objects.count(), User.objects.count())
+    #     model.load_weights(settings.TRAINED_MODEL_PATH)
+    #     query = tf.constant([self.int_id])
+    #     candidates = tf.range(Business.objects.count(), dtype=tf.int32)
+    #     user_embeddings = model.user_embeddings(query)
+    #     biz_embeddings = model.biz_embeddings(candidates)
+    #     scores = tf.matmul(user_embeddings, biz_embeddings, transpose_b=True)
+    #     top_indices = tf.argsort(scores, axis=1, direction='DESCENDING')[0][:limit]
+    #     return Business.objects.filter(id__in=top_indices.numpy()).filter()
+
 
     def __str__(self):
         return self.email
@@ -79,17 +104,17 @@ class Business(models.Model):
     PRICE = {
         ('$',   'Cheap'),
         ('$$',  'Reasonable'),
-        ('$$$', 'EXpensive'),
+        ('$$$', 'Expensive'),
         ('$$$$','Luxurious'),
     }
-    string_id = models.CharField(max_length=22, primary_key=True, unique=True)
+    int_id = models.IntegerField(primary_key=True, unique=True)
     alias = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     image_url = models.URLField(max_length=1000, null=True)
     url = models.URLField(max_length=1000)
     is_closed = models.BooleanField()
     review_count = models.PositiveIntegerField()
-    rating = models.PositiveSmallIntegerField()
+    rating = models.FloatField()
     latitude = models.FloatField()
     longitude = models.FloatField()
     price = models.CharField(
@@ -124,7 +149,7 @@ class Review(models.Model):
         (4, 'Four Star'),
         (5, 'Five Star'),
     ]
-    string_id = models.CharField(max_length=22, primary_key=True)
+    int_id = models.IntegerField(primary_key=True, unique=True)
     url = models.URLField(max_length=1000)
     text = models.TextField()
     rating = models.IntegerField(choices=RATING_STARS)
@@ -137,7 +162,7 @@ class Review(models.Model):
         ordering = ['-business']
 
     def __str__(self):
-        return str(self.string_id) + str(self.user)\
+        return str(self.user.username)\
             + " rates " + str(self.business)\
             + " with a " + str(self.rating)\
             + " Star at "\

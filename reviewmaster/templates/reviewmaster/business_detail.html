@@ -4,14 +4,14 @@
 {% block content %}
 
     {% if business %}
-    <p>Business Id: {{ business.string_id }}</p>
+    <p>Business Id: {{ business.int_id }}</p>
     <p>Business name: {{ business.name}}</p>
     <p>Also known as: {{ business.alias}}</p>
-    <p>Industry: {{ business.industry }}</p>
-    <p>Business Profile: <a href="{% url 'business_detail' business.url %}">{{business.url}}</a></p>
+{% comment %}    <p>Industry: {{ business.industry }}</p>
+    <p>Business Profile: <a href="{% url 'business_detail' business.url %}">{{business.name}}</a></p>
         {% if business.image_url %}
         <img src="{% url business.image_url %}" alt="business Logo" style="width:500px;height:600px;">
-        {% endif %}
+        {% endif %} {% endcomment %}
         {% if business.is_closed %}
         <p>Closed</p>
         {% else %}
