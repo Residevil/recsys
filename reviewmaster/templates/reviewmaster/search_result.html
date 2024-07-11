@@ -1,0 +1,19 @@
+{% extends "base.html "%}
+
+{% block content %}
+
+<h1>Search Result</h1>
+
+<ul class="list-group">
+{% for business in object_list %}
+    <li class="list-group-item">
+        <a class="list-group-item-action" href="{% url 'business_detail' business.int_id %}">
+            {{business.name}}
+        </a>
+    </li>
+{% empty %}
+    <p>Could not find business with this name.</p>
+{% endfor %}
+</ul>
+
+{% endblock %}

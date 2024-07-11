@@ -1,6 +1,8 @@
 import random
 
 import requests
+from django.db.models import Q
+
 from .models import User, Business, Review
 from .forms import RegisterForm, LoginForm, GenerateRandomUserForm
 from .tasks import create_random_user_accounts
@@ -570,3 +572,14 @@ class ReviewDeleteView(LoginRequiredMixin, DeleteView):
 #                 _("This account is inactive."),
 #                 code="inactive",
 #             )
+
+class SearchResultView(ListView):
+    model = Business
+    template_name = 'search_result.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        object_list = Business.objects.filter(
+            Q(name__icontains=query) | Q(alias__icontains=query) | Q(int_id__icontains=query)
+        )
+        return object_list

@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 import tensorflow as tf
 
-from recsys import settings
+from django.conf import settings
 from .tensorflow import RecommenderModel, Recommender
 from .managers import CustomUserManager
 

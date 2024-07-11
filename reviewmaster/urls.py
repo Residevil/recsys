@@ -50,4 +50,5 @@ urlpatterns = [
     # path("change-password/", views.PasswordChangeView.as_view(template_name="registration/password_change.html"), name="password_change"),
 
     path("generate/", views.GenerateRandomUserView.as_view(template_name="reviewmaster/generate_random_users.html"), name="generate_random_users"),
+    path("search/", views.SearchResultView.as_view(template_name="reviewmaster/search_result.html"), name="search_result"),
 ]
