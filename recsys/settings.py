@@ -75,11 +75,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'recsys.wsgi.application'
 
-COMPRESS_ROOT = BASE_DIR / 'reviewmaster' / 'static'
-
-COMPRESS_ENABLED = True
-
-STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+# COMPRESS_ROOT = BASE_DIR / 'reviewmaster' / 'static'
+#
+# COMPRESS_ENABLED = True
+#
+# STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 
 # Database
