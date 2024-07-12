@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'django_celery_beat',
     'django_celery_results',
+    'compressor',
     'reviewmaster.apps.ReviewmasterConfig',
 ]
 
@@ -59,7 +60,7 @@ ROOT_URLCONF = 'recsys.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'reviewmaster' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,6 +74,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'recsys.wsgi.application'
+
+COMPRESS_ROOT = BASE_DIR / 'reviewmaster' / 'static'
+
+COMPRESS_ENABLED = True
+
+STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 
 # Database
